@@ -7,7 +7,7 @@ function create_debug_menu() {
             {
                 'id': '4',
                 'type': 'webview',
-                'data': '<!DOCTYPE html><html><body><div class="button-bar"><div id="times"><font color="red" onclick="sortbytimes();"><b>总次数</b></font></div><div id="delta"><font color="red" onclick="sortbydelta();"><b>增量</b></font></div><div id="clear"><font color="red" onclick="cclear();"><b>清空</b></font></div></div><style>.button-bar {display: flex;flex-direction: row;justify-content: space-between;}.button-bar>div {flex: 1;margin: 5px;text-align: center;}</style><dl id="list1"></dl><script>function sortbytimes() {jsCallMethod("sortbytimes", "times", function (a) {document.getElementById("list1").innerHTML = a;});}function sortbydelta() {jsCallMethod("sortbydelta", "delta", function (a) {document.getElementById("list1").innerHTML = a;});}function cclear() {jsCallMethod("清除", "clear", function (a) {document.getElementById("list1").innerHTML = a;});}</script></body></html>'
+                'data': '<!DOCTYPE html><html><body><div class="button-bar"><div id="times"><font color="red" onclick="sortbytimes();"><b>总次数</b></font></div><div id="delta"><font color="red" onclick="sortbydelta();"><b>增量</b></font></div><div id="clear"><font color="red" onclick="cclear();"><b>清空</b></font></div><div id="checkbox1"><input type="checkbox" checked="false" onclick="autorefresh(checked);"><font color="red"><b>自动刷新</b></font></div></div><style>.button-bar {display: flex;flex-direction: row;justify-content: space-between;}.button-bar>div {flex: 1;margin: 5px;text-align: center;}</style><dl id="list1"></dl><script>var sortmode = "sortbytimes";function sortbydelta() {sortmode = "sortbydelta";refresh("sortbydelta");}function sortbytimes() {sortmode = "sortbytimes";refresh("sortbytimes");}function cclear() {jsCallMethod("清除", "clear", function (a) {document.getElementById("list1").innerHTML = a;});}var intervalID;function autorefresh(checked) {if (checked) { intervalID = setInterval(refresh, 1000,sortmode); }else { clearInterval(intervalID); }}function refresh(sortmode) {jsCallMethod("refresh", sortmode, function (a) {document.getElementById("list1").innerHTML = a;});}</script></body></html>'
             }
         ]
         , {
@@ -20,16 +20,11 @@ function create_debug_menu() {
                 if (result.method == 'onload') {
                     //console.log('init');
                 }
-                else if (result.method == 'sortbydelta') {
-                    propName = "delta";
-                    menu1.webviewcall(result.id, refreshed());
-                }
-                else if (result.method == 'sortbytimes') {
-                    propName = "times";
+                else if (result.method == 'refresh') {
+                    propName = result.args;
                     menu1.webviewcall(result.id, refreshed());
                 }
                 else if (result.method == '清除') {
-                    //console.log(111);
                     build_dic();
                     menu1.webviewcall(result.id, refreshed());
                 }
@@ -81,6 +76,5 @@ function findfun(addrArray) {
 }
 var BaseAddr = Module.findBaseAddress("libil2cpp.so");
 var findfunction = [];//填入所有函数相对偏移
-build_dic();
-findfun(findfunction);
 create_debug_menu();
+findfun(findfunction);
